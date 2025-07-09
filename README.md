@@ -48,17 +48,6 @@ A comprehensive ROCm ecosystem **V**ersion **V**erification and **V**isualizatio
 **Additional Components:**
 - Composable Kernel (CK), RCCL, rocminfo, hipBLASLt
 
-## Features
-
-- 🎨 **Colorful Output** - Easy-to-read terminal colors
-- 🔍 **Smart Search** - Automatically searches multiple system directories
-- 📊 **GPU Detection** - Displays AMD GPU information
-- 🚀 **Fast & Efficient** - Quick version detection with progress bar
-- 💡 **Clear Summary** - Shows found vs missing components
-- 🛠️ **Multiple Methods** - Uses various detection techniques
-- 📍 **Path Tracking** - Shows exact file paths where versions were found
-- 🎯 **Flexible Modes** - Simple mode for essentials, full mode for comprehensive scan
-
 ## Installation
 
 ```bash
@@ -166,14 +155,6 @@ sudo rocm-vvv --mode full
 - Python 3.6 or higher
 - Linux operating system
 - ROCm installation (for detecting components)
-
-## Use Cases
-
-- 🔧 **Debugging** - Troubleshoot ROCm installation issues
-- 📋 **System Inventory** - Document your ROCm setup
-- 🔍 **Compatibility Check** - Verify component versions
-- 🚀 **Pre-installation** - Check what's already installed
-- 📊 **CI/CD Integration** - Automated version checking
 
 ## License
 

@@ -269,7 +269,7 @@ def main():
                         help='Search mode: simple (essential components) or full (all components)')
     parser.add_argument('--no-progress', action='store_true',
                         help='Disable progress bar')
-    parser.add_argument('--version', action='version', version='rocm-vvv 0.0.6')
+    parser.add_argument('--version', action='version', version='rocm-vvv 0.0.7')
     
     args = parser.parse_args()
     
