@@ -34,13 +34,58 @@ class ComponentDetector(ABC):
         return None
     
     def find_file_version(self, pattern: str) -> Optional[Tuple[str, str]]:
-        """Search for files matching pattern and extract version"""
-        for search_dir in self.search_dirs:
-            for file_path in glob.glob(os.path.join(search_dir, pattern), recursive=True):
-                if os.path.isfile(file_path):
-                    version_match = re.search(r'(\d+\.\d+\.\d+(?:\.\d+)?)', file_path)
-                    if version_match:
-                        return version_match.group(1), file_path
+        """Search for files matching pattern and extract version with limited depth"""
+        import signal
+        
+        def timeout_handler(signum, frame):
+            raise TimeoutError("Search timed out")
+        
+        # Set 3-second timeout for search
+        signal.signal(signal.SIGALRM, timeout_handler)
+        signal.alarm(3)
+        
+        try:
+            # For recursive patterns, limit search to common ROCm paths
+            if '**/' in pattern:
+                # Remove ** and search in specific subdirectories only
+                clean_pattern = pattern.replace('**/', '')
+                search_paths = [
+                    'lib', 'lib64', 'include', 'bin', 
+                    'lib/x86_64-linux-gnu', 'usr/lib', 'usr/lib64',
+                    'share', 'lib/cmake'
+                ]
+                
+                for search_dir in self.search_dirs:
+                    # Limit to 2 levels deep max
+                    for subpath in search_paths:
+                        full_pattern = os.path.join(search_dir, subpath, clean_pattern)
+                        for file_path in glob.glob(full_pattern):
+                            if os.path.isfile(file_path):
+                                version_match = re.search(r'(\d+\.\d+\.\d+(?:\.\d+)?)', file_path)
+                                if version_match:
+                                    return version_match.group(1), file_path
+                        
+                        # Also try one level deeper
+                        full_pattern = os.path.join(search_dir, subpath, '*', clean_pattern)
+                        for file_path in glob.glob(full_pattern):
+                            if os.path.isfile(file_path):
+                                version_match = re.search(r'(\d+\.\d+\.\d+(?:\.\d+)?)', file_path)
+                                if version_match:
+                                    return version_match.group(1), file_path
+            else:
+                # Non-recursive patterns work as before
+                for search_dir in self.search_dirs:
+                    for file_path in glob.glob(os.path.join(search_dir, pattern)):
+                        if os.path.isfile(file_path):
+                            version_match = re.search(r'(\d+\.\d+\.\d+(?:\.\d+)?)', file_path)
+                            if version_match:
+                                return version_match.group(1), file_path
+        except (TimeoutError, OSError):
+            # Search timed out or failed, continue to next component
+            pass
+        finally:
+            signal.alarm(0)  # Cancel the alarm
+            
         return None
     
     def read_file_for_version(self, file_path: str, pattern: str) -> Optional[Tuple[str, str]]:

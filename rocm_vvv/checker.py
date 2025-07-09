@@ -193,11 +193,26 @@ class ROCmVersionChecker:
                 progress_bar.update(f"Checking {name}...")
             
             try:
-                version = detector.detect()
-                if version:
-                    versions[name] = version
-            except Exception as e:
-                # Log error but continue
+                # Add timeout protection for component detection
+                import signal
+                
+                def timeout_handler(signum, frame):
+                    raise TimeoutError(f"Detection timeout for {name}")
+                
+                signal.signal(signal.SIGALRM, timeout_handler)
+                signal.alarm(5)  # 5-second timeout per component
+                
+                try:
+                    version = detector.detect()
+                    if version:
+                        versions[name] = version
+                finally:
+                    signal.alarm(0)  # Cancel alarm
+                    
+            except (Exception, TimeoutError) as e:
+                # Component timed out or failed, continue to next
+                if progress_bar:
+                    progress_bar.update(f"Checking {name}... timeout/error")
                 pass
         
         return versions
@@ -254,7 +269,7 @@ def main():
                         help='Search mode: simple (essential components) or full (all components)')
     parser.add_argument('--no-progress', action='store_true',
                         help='Disable progress bar')
-    parser.add_argument('--version', action='version', version='rocm-vvv 0.0.5')
+    parser.add_argument('--version', action='version', version='rocm-vvv 0.0.6')
     
     args = parser.parse_args()
     
