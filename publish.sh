@@ -10,12 +10,6 @@ if [ ! -f "setup.py" ] || [ ! -f "rocm_vvv/__init__.py" ]; then
     exit 1
 fi
 
-# Check if required tools are installed
-if ! command -v twine &> /dev/null; then
-    echo "📦 Installing required tools..."
-    pip install --upgrade pip build twine
-fi
-
 # Get current version
 CURRENT_VERSION=$(python3 -c "import rocm_vvv; print(rocm_vvv.__version__)")
 echo "📌 Current version: $CURRENT_VERSION"
@@ -46,83 +40,67 @@ sed -i.bak "s/__version__ = .*/__version__ = \"$VERSION\"/" rocm_vvv/__init__.py
 # Update version in checker.py
 sed -i.bak "s/version='rocm-vvv .*/version='rocm-vvv $VERSION')/" rocm_vvv/checker.py
 
+# Update version in pyproject.toml
+sed -i.bak "s/version = \".*\"/version = \"$VERSION\"/" pyproject.toml
+
 echo "🧹 Cleaning up previous builds..."
 rm -rf build/ dist/ *.egg-info/
 
-echo "🔨 Building package..."
-python3 -m build
-
-echo "🔍 Checking package..."
-echo "⚠️  Skipping twine check due to metadata format issues - PyPI will validate on upload"
-
-echo "📊 Package contents:"
-echo "===================="
-ls -la dist/
+# Clean up backup files
+rm -f setup.py.bak rocm_vvv/__init__.py.bak rocm_vvv/checker.py.bak pyproject.toml.bak
 
 echo ""
-echo "🎯 Ready to publish to PyPI!"
-echo "Package: rocm-vvv version $VERSION"
+echo "✅ Version updated to $VERSION!"
 echo ""
 
-# Skip PyPI credential check if running in CI
-if [ "$CI" != "true" ]; then
-    # Check for PyPI credentials
-    if [ -z "$TWINE_USERNAME" ] && [ -z "$TWINE_PASSWORD" ] && [ ! -f ~/.pypirc ]; then
-        echo "⚠️  PyPI credentials not found."
-        echo "   Please set TWINE_USERNAME and TWINE_PASSWORD environment variables:"
-        echo "   export TWINE_USERNAME=__token__"
-        echo "   export TWINE_PASSWORD=pypi-your-api-token-here"
-        echo ""
-        echo "   Or use ~/.pypirc file for local development"
-        echo ""
-        read -p "❓ Do you have PyPI credentials configured? (y/N): " CREDS_OK
-        if [[ ! $CREDS_OK =~ ^[Yy]$ ]]; then
-            echo "❌ Please configure PyPI credentials first."
-            # Restore backup files
-            mv setup.py.bak setup.py
-            mv rocm_vvv/__init__.py.bak rocm_vvv/__init__.py
-            mv rocm_vvv/checker.py.bak rocm_vvv/checker.py
-            echo "🔄 Version changes reverted."
-            exit 1
-        fi
-    fi
-fi
+# Ask for automatic git operations
+read -p "🚀 Do you want to automatically commit, tag, and push? (Y/n): " AUTO_PUSH
+AUTO_PUSH=${AUTO_PUSH:-Y}  # Default to Y if empty
 
-# Ask for confirmation
-read -p "❓ Do you want to publish to PyPI now? (y/N): " CONFIRM
-
-if [[ $CONFIRM =~ ^[Yy]$ ]]; then
-    echo "🚀 Publishing to PyPI..."
+if [[ $AUTO_PUSH =~ ^[Yy]$ ]]; then
+    echo ""
+    echo "📦 Committing changes..."
+    git add .
+    git commit -m "Bump version to $VERSION" || {
+        echo "❌ Error: Failed to commit. Please check if there are any issues."
+        exit 1
+    }
     
-    # Use environment variables if available, otherwise fall back to config file
-    if [ -n "$TWINE_USERNAME" ] && [ -n "$TWINE_PASSWORD" ]; then
-        twine upload dist/*
-    else
-        echo "🔐 Using ~/.pypirc credentials..."
-        twine upload dist/*
-    fi
-    
-    echo "✅ Successfully published to PyPI!"
-    echo "📦 Package available at: https://pypi.org/project/rocm-vvv/$VERSION/"
-    
-    # Clean up backup files
-    rm -f setup.py.bak rocm_vvv/__init__.py.bak rocm_vvv/checker.py.bak
-    
-    echo "🏷️  Creating Git tag..."
-    git add setup.py rocm_vvv/__init__.py rocm_vvv/checker.py
-    git commit -m "Bump version to $VERSION"
-    git tag -a "v$VERSION" -m "Release version $VERSION"
+    echo "🏷️  Creating tag v$VERSION..."
+    git tag "v$VERSION"
     
     echo "📤 Pushing to GitHub..."
-    git push origin main
-    git push origin "v$VERSION"
+    git push origin main || {
+        echo "❌ Error: Failed to push to main branch. Please check your connection."
+        exit 1
+    }
     
-    echo "🎉 All done! Package published and tagged."
+    echo "📤 Pushing tag..."
+    git push origin "v$VERSION" || {
+        echo "❌ Error: Failed to push tag. Please check your connection."
+        exit 1
+    }
+    
+    echo ""
+    echo "✅ All done! Version $VERSION has been pushed to GitHub."
+    echo ""
+    echo "🚀 GitHub Actions is now building and publishing to PyPI!"
+    echo "   Check progress at: https://github.com/JH-Leon-KIM-AMD/rocm-vvv/actions"
+    echo ""
+    echo "📦 Package will be available at: https://pypi.org/project/rocm-vvv/$VERSION/"
+    echo ""
 else
-    echo "❌ Publication cancelled."
-    # Restore backup files
-    mv setup.py.bak setup.py
-    mv rocm_vvv/__init__.py.bak rocm_vvv/__init__.py
-    mv rocm_vvv/checker.py.bak rocm_vvv/checker.py
-    echo "🔄 Version changes reverted."
+    echo ""
+    echo "📌 Manual steps to publish:"
+    echo "───────────────────────────────────────"
+    echo "git add ."
+    echo "git commit -m \"Bump version to $VERSION\""
+    echo "git tag v$VERSION"
+    echo "git push origin main"
+    echo "git push origin v$VERSION"
+    echo "───────────────────────────────────────"
+    echo ""
+    echo "🚀 GitHub Actions will automatically build and publish to PyPI!"
+    echo "   Check progress at: https://github.com/JH-Leon-KIM-AMD/rocm-vvv/actions"
+    echo ""
 fi

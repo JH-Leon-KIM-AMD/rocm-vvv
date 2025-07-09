@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rocm-vvv"
-version = "0.0.1"
+version = "0.0.5"
 description = "A comprehensive ROCm ecosystem version checker with colorful output"
 readme = "README.md"
 authors = [
