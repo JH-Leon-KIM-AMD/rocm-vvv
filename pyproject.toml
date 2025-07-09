@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rocm-vvv"
+version = "0.0.1"
+description = "A comprehensive ROCm ecosystem version checker with colorful output"
+readme = "README.md"
+authors = [
+    {name = "JeongHyun Kim", email = "jeonghyun.kim@amd.com"}
+]
+license = "MIT"
+requires-python = ">=3.6"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Topic :: System :: Hardware",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: POSIX :: Linux",
+]
+keywords = ["rocm", "amd", "gpu", "version", "checker", "hip", "miopen", "rocblas", "vvv"]
+
+[project.urls]
+Homepage = "https://github.com/JH-Leon-KIM-AMD/rocm-vvv"
+"Bug Reports" = "https://github.com/JH-Leon-KIM-AMD/rocm-vvv/issues"
+"Source" = "https://github.com/JH-Leon-KIM-AMD/rocm-vvv"
+
+[project.scripts]
+rocm-vvv = "rocm_vvv.checker:main"
+rvvv = "rocm_vvv.checker:main"
+
+[tool.setuptools]
+packages = ["rocm_vvv", "tests"]

@@ -1,0 +1,120 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Personal/System Information
+info.txt
+*.log
+*.tmp
+*.temp
+config.json
+settings.json
+credentials.json
+*.key
+*.pem
+*.cert
+*.token
+
+# PyPI credentials and secrets
+.pypirc
+*.pypirc
+twine.cfg
+secrets.txt
+api_token.txt
+*.secret
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.staging
+
+# Claude Code working files
+CLAUDE.md.bak
+*.claude
+.claude/
+claude_*
+.temp_*
+
+# Development/test files
+run_checker.py
+direct_upload.py
+upload_workaround.py
+*.bak
+
+# PyPI/Publishing sensitive files
+.pypirc
+twine.ini
+publish_config.json
+
+# System-specific files
+/opt/
+/usr/local/
+/media/
+/mnt/
+rocm_system_info.json
+gpu_info.json
+hardware_config.json
