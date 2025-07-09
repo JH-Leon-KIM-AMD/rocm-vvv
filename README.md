@@ -1,5 +1,10 @@
 # rocm-vvv
 
+[![PyPI version](https://badge.fury.io/py/rocm-vvv.svg)](https://badge.fury.io/py/rocm-vvv)
+[![Python versions](https://img.shields.io/pypi/pyversions/rocm-vvv.svg)](https://pypi.org/project/rocm-vvv/)
+[![Downloads](https://pepy.tech/badge/rocm-vvv)](https://pepy.tech/project/rocm-vvv)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A comprehensive ROCm ecosystem **V**ersion **V**erification and **V**isualization tool with colorful terminal output.
 
 ## Author
